@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 40" width="220" height="40">
+  <defs>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF2A42"/>
+      <stop offset="100%" stop-color="#D6182B"/>
+    </linearGradient>
+  </defs>
+  <polygon points="10,6 30,6 30,18 20,34 10,34" fill="url(#redGrad)"/>
+  <polygon points="24,6 34,6 44,20 34,34 24,34 34,20" fill="#FFFFFF"/>
+  <text x="50" y="27" font-family="'Segoe UI', 'Roboto', 'Arial Black', sans-serif" font-size="21" font-weight="900" fill="#FFFFFF" letter-spacing="3">RADEON</text>
+  <rect x="156" y="10" width="56" height="18" rx="3" fill="#202530" stroke="#FF2A42" stroke-width="1"/>
+  <text x="160" y="23" font-family="'Segoe UI', 'Roboto', sans-serif" font-size="9" font-weight="bold" fill="#FF2A42" letter-spacing="1">ADRENALIN</text>
+</svg>

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=AMD Software: Adrenalin Edition
+Comment=AMD Radeon GPU Control Center, Performance Telemetry & Tuning for Linux
+GenericName=AMD GPU Control Center
+Exec=amd-control-center
+Icon=amd-control-center
+Terminal=false
+Type=Application
+Categories=Settings;HardwareSettings;Game;System;
+Keywords=amd;radeon;gpu;overclock;undervolt;adrenalin;control;center;fan;vram;
+StartupNotify=true
+StartupWMClass=amd-control-center

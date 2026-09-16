@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "amd-control-center"
+version = "1.0.0"
+description = "AMD Radeon Software Adrenalin Edition for Linux"
+authors = [{name = "Julian"}]
+dependencies = [
+    "PyQt6>=6.4.0"
+]
+requires-python = ">=3.8"
+
+[project.scripts]
+amd-control-center = "amd_control_center.app:main"

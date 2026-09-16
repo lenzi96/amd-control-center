@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E222B"/>
+      <stop offset="100%" stop-color="#0F1115"/>
+    </linearGradient>
+    <linearGradient id="redRuby" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF2F47"/>
+      <stop offset="100%" stop-color="#C71527"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bgGrad)" stroke="#2F3646" stroke-width="2.5"/>
+  <!-- Radeon Ruby Red Stylized Emblem -->
+  <polygon points="28,24 68,24 68,54 48,84 28,84" fill="url(#redRuby)"/>
+  <polygon points="56,24 76,24 98,54 78,84 58,84 76,54" fill="#FFFFFF"/>
+  <!-- Bottom bar with AMD Red glow -->
+  <rect x="28" y="96" width="72" height="6" rx="3" fill="url(#redRuby)"/>
+</svg>

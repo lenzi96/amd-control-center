@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# AMD Software: Adrenalin Edition launcher
+
+SCRIPT_DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/main.py" ] && [ -d "$SCRIPT_DIR/amd_control_center" ]; then
+    APP_DIR="$SCRIPT_DIR"
+elif [ -n "$AMD_DEV_DIR" ] && [ -d "$AMD_DEV_DIR" ]; then
+    APP_DIR="$AMD_DEV_DIR"
+elif [ -d "$HOME/.local/share/amd-control-center" ]; then
+    APP_DIR="$HOME/.local/share/amd-control-center"
+elif [ -d "/run/media/julian/HDD/Linux/amd-control-center" ]; then
+    APP_DIR="/run/media/julian/HDD/Linux/amd-control-center"
+else
+    echo "Error: amd-control-center installation not found." >&2
+    exit 1
+fi
+
+export PYTHONPATH="$APP_DIR:$PYTHONPATH"
+exec python3 "$APP_DIR/main.py" "$@"
