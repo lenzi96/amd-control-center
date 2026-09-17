@@ -258,29 +258,48 @@ class HomeView(QWidget):
         lbl_badge = QLabel("LEISTUNGSÜBERSICHT")
         lbl_badge.setStyleSheet("font-size: 11px; font-weight: 800; color: #E01E37; letter-spacing: 1.5px;")
 
-        btn_metrics = QPushButton("Alle Metriken →")
+        btn_metrics = QPushButton("GPU Metriken →")
         btn_metrics.setProperty("class", "ghost-button")
         btn_metrics.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_metrics.clicked.connect(lambda: self.navigate_to_tab.emit(2))
 
+        btn_ryzen = QPushButton("Ryzen Master →")
+        btn_ryzen.setProperty("class", "ghost-button")
+        btn_ryzen.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_ryzen.setStyleSheet("color: #FF5500; font-weight: 800;")
+        btn_ryzen.clicked.connect(lambda: self.navigate_to_tab.emit(3))
+
         top_row.addWidget(lbl_badge)
         top_row.addStretch()
         top_row.addWidget(btn_metrics)
+        top_row.addWidget(btn_ryzen)
         layout.addLayout(top_row)
 
-        # Telemetry cards mini grid
+        # Telemetry cards mini grid (GPU + CPU)
         grid = QGridLayout()
         grid.setSpacing(10)
 
         self.card_temp = MetricCard("GPU TEMP", "°C", 110)
         self.card_load = MetricCard("GPU LOAD", "%", 100)
+        self.card_cpu_temp = MetricCard("CPU TEMP", "°C", 100)
+        self.card_cpu_temp.progress.setStyleSheet("""
+            QProgressBar { background-color: #10131A; border: none; border-radius: 2px; }
+            QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #F39C12, stop:1 #FF5500); border-radius: 2px; }
+        """)
+        self.card_cpu_power = MetricCard("CPU POWER", "W", 150)
+        self.card_cpu_power.progress.setStyleSheet("""
+            QProgressBar { background-color: #10131A; border: none; border-radius: 2px; }
+            QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #00B0FF, stop:1 #00E676); border-radius: 2px; }
+        """)
         self.card_vram = MetricCard("VRAM", "MB", self.gpu.vram_total_mb)
-        self.card_clock = MetricCard("TAKT", "MHz", 3500)
+        self.card_clock = MetricCard("GPU TAKT", "MHz", 3500)
 
         grid.addWidget(self.card_temp, 0, 0)
         grid.addWidget(self.card_load, 0, 1)
-        grid.addWidget(self.card_vram, 1, 0)
-        grid.addWidget(self.card_clock, 1, 1)
+        grid.addWidget(self.card_cpu_temp, 1, 0)
+        grid.addWidget(self.card_cpu_power, 1, 1)
+        grid.addWidget(self.card_vram, 2, 0)
+        grid.addWidget(self.card_clock, 2, 1)
 
         layout.addLayout(grid)
         return card
@@ -384,7 +403,7 @@ class HomeView(QWidget):
         layout.addStretch()
         btn_disp = QPushButton("Anzeigeeinstellungen verwalten")
         btn_disp.setCursor(Qt.CursorShape.PointingHandCursor)
-        btn_disp.clicked.connect(lambda: self.navigate_to_tab.emit(3))
+        btn_disp.clicked.connect(lambda: self.navigate_to_tab.emit(4))
         layout.addWidget(btn_disp)
 
         return card
@@ -404,3 +423,13 @@ class HomeView(QWidget):
         clock = data.get("sclk", 0)
         power = data.get("power_w", 0)
         self.card_clock.set_value(clock, display_str=f"{clock}", sub_str=f"Power: {power:.0f} W")
+
+    def update_cpu_telemetry(self, data: dict):
+        if hasattr(self, "card_cpu_temp"):
+            tctl = data.get("temp_tctl", 0.0)
+            tccd1 = data.get("temp_tccd1", 0.0)
+            self.card_cpu_temp.set_value(tctl, display_str=f"{tctl:.0f}", sub_str=f"CCD: {tccd1:.0f}°C" if tccd1 > 0 else "")
+        if hasattr(self, "card_cpu_power"):
+            pkg_w = data.get("package_power_w", 0.0)
+            peak_mhz = data.get("peak_freq_mhz", 0.0)
+            self.card_cpu_power.set_value(pkg_w, display_str=f"{pkg_w:.1f}", sub_str=f"{peak_mhz:.0f} MHz Peak")

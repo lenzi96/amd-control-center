@@ -39,7 +39,29 @@ Ein leistungsstarkes und optisch an die offizielle **AMD Software: Adrenalin Edi
   - **Power Limit (PPT):** Anpassung der Board-Leistungsgrenze (z. B. 231W bis 374W).
   - Sichere Anwendung über `pkexec` oder udev-Regeln.
 
-### 4. ⚙️ Einstellungen (Settings)
+### 4. 🔥 AMD Ryzen™ Master & CPU Performance (Überwachung & Tuning)
+- **Universelle Prozessor- & Hardware-Erkennung:**
+  - **AMD Ryzen:** Zen 5 (Granite Ridge, 9800X3D/9950X), Zen 4 (7800X3D), Zen 3 (5800X3D), Zen 2, Zen+, Threadripper & APUs (inkl. Steam Deck).
+  - **Intel Core:** Arrow Lake, Raptor Lake (14th/13th Gen), Alder Lake (12th Gen) mit hybrider **⚡ P-Core** & **🌱 E-Core** Erkennung.
+  - **3D V-Cache Erkennung:** Automatische Identifikation von gestapeltem L3-Cache (96 MB bis 128 MB+).
+  - **CPPC Preferred Cores (Gold- & Silber-Kerne):** Hardwarebasierte Güte-Erkennung der Boost-Kerne mit ⭐ Gold- und 🥈 Silber-Sternen für maximale Single-Core Performance.
+- **⚡ Curve Optimizer (PBO & Undervolting):**
+  - **All-Core & Per-Core Undervolting:** Schieberegler von -30 bis +10 Counts (1 Count ≈ 3–5 mV) für niedrigere Temperaturen und anhaltend hohe Boost-Taktraten.
+  - **AMD SMU Mailbox-Anbindung:** Direkte Steuerung über den Kernel-Treiber `ryzen_smu` mit persistentem JSON-Profilspeicher (`~/.config/amd-control-center/ryzen_co_profile.json`).
+  - **Adaptive Oberfläche:** Zeigt auf Intel-Systemen hilfreiche Hinweise zu MSR 0x150 / `intel-undervolt`.
+- **Echtzeit-Telemetrie:**
+  - **Live Watt pro Kern & Socket:** Hochpräzise Energiemessung ohne Root über das `zenergy`-Modul (AMD) bzw. `intel_rapl` / Linux RAPL.
+  - **Temperaturen:** `k10temp` (Tctl & CCD1) bzw. `coretemp` und DDR5-RAM-Temperatursensoren (`spd5118`).
+  - **Peak Core Speed:** Automatische Identifikation und Anzeige des höchstaktenden Kerns.
+- **Active Cores Matrix:** Raster mit Live-Takt (MHz), Leistungsaufnahme (Watt) und Auslastungsbalken pro Kern mit P/E-Core bzw. Gold/Silber Kennzeichnung.
+- **CPU Tuning & Profile:**
+  - **1-Klick Presets:** Gaming Boost (inkl. Curve Optimizer -20), Balanced, Eco Mode (-30 CO), Pure Cores (SMT Aus).
+  - **Energy Performance Preference (EPP):** `performance`, `balance_performance`, `power`.
+  - **Precision Boost & SMT / Hyper-Threading Schalter:** Dynamisches Zu-/Abschalten von Core Performance Boost und Multithreading.
+  - **Frequenz-Limits:** Schieberegler für maximale Taktgrenzen.
+- **Echtzeit-Verlaufskurve:** Integrierter Multi-Kurven-Graph für CPU-Last, Temperatur, Watt und Takt.
+
+### 5. ⚙️ Einstellungen (Settings)
 - **Systeminfo:** Detaillierte Übersicht über GPU-Modell, Device ID, VBIOS-Version, VRAM-Hersteller (Samsung GDDR6), PCIe-Link-Geschwindigkeit (Gen 4/5 x16) und Software-Stack.
 - **Anzeige:** Monitor-Erkennung (DP-1, 3840x2160 @ 144Hz), FreeSync / Adaptive Sync Status und HDR.
 - **Optionen:** Autostart, System-Tray Minimierung, 1-Klick udev-Regel für passwortloses Tuning.

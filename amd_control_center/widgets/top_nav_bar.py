@@ -12,7 +12,7 @@ class TopNavBar(QWidget):
     settings_requested = pyqtSignal()
     update_requested = pyqtSignal()
 
-    def __init__(self, gpu_name: str = "AMD Radeon GPU", driver_ver: str = "Mesa Up to date", parent=None):
+    def __init__(self, gpu_name: str = "AMD Radeon GPU", driver_ver: str = "Mesa Up to date", is_amd_cpu: bool = True, parent=None):
         super().__init__(parent)
         self.setFixedHeight(60)
         self.setStyleSheet("""
@@ -55,9 +55,10 @@ class TopNavBar(QWidget):
         self.tab_home = QPushButton("HOME")
         self.tab_gaming = QPushButton("GAMING")
         self.tab_perf = QPushButton("PERFORMANCE")
+        self.tab_ryzen = QPushButton("RYZEN MASTER" if is_amd_cpu else "CPU PERFORMANCE")
         self.tab_settings = QPushButton("SETTINGS")
 
-        tabs = [self.tab_home, self.tab_gaming, self.tab_perf, self.tab_settings]
+        tabs = [self.tab_home, self.tab_gaming, self.tab_perf, self.tab_ryzen, self.tab_settings]
         for idx, tab in enumerate(tabs):
             tab.setCheckable(True)
             tab.setProperty("class", "nav-tab")

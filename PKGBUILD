@@ -1,6 +1,6 @@
 # Maintainer: Julian
 pkgname=amd-control-center-git
-pkgver=1.0.0
+pkgver=1.1.0
 pkgrel=1
 pkgdesc="AMD Radeon Software Adrenalin Edition for Linux"
 arch=('any')

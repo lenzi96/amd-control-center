@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="amd-control-center",
-    version="1.0.0",
+    version="1.1.0",
     description="AMD Radeon Software Adrenalin Edition for Linux",
     author="Julian",
     packages=find_packages(),

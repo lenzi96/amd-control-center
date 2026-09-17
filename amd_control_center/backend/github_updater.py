@@ -48,7 +48,7 @@ except (ImportError, ValueError):
     try:
         from amd_control_center import __version__
     except Exception:
-        __version__ = "1.0.0"
+        __version__ = "1.1.0"
 
 DEFAULT_GITHUB_REPO = "lenzi96/amd-control-center"
 CONFIG_FILE = Path.home() / ".config" / "amd-control-center" / "updater_config.json"

@@ -12,6 +12,8 @@ from PyQt6.QtWidgets import (
 from .styles import ADRENALIN_STYLESHEET
 from .backend.gpu_detector import detect_amd_gpus, GpuDevice
 from .backend.gpu_monitor import GpuTelemetryMonitor
+from .backend.cpu_detector import detect_cpu, CpuDevice
+from .backend.cpu_monitor import CpuTelemetryMonitor
 from .backend.game_scanner import scan_steam_games, scan_all_games, GameInfo
 from .backend.game_profiles import ProfileManager
 from .backend.display_manager import detect_displays, DisplayInfo
@@ -35,7 +37,7 @@ class MainWindow(QMainWindow):
         from .icon import get_app_icon
         self.setWindowIcon(get_app_icon())
 
-        # Fast Hardware & System Detection
+        # Fast Hardware & System Detection (GPU & CPU)
         gpus = detect_amd_gpus()
         self.gpu: GpuDevice = gpus[0] if gpus else GpuDevice(
             card_path="/sys/class/drm/card1",
@@ -43,6 +45,7 @@ class MainWindow(QMainWindow):
             device_dir="",
             model_name="AMD Radeon GPU"
         )
+        self.cpu: CpuDevice = detect_cpu()
         
         # Display detection
         displays = detect_displays()
@@ -77,7 +80,7 @@ class MainWindow(QMainWindow):
 
         # Top Navigation Bar
         driver_str = f"{self.audit.mesa_version} • Up to date"
-        self.top_nav = TopNavBar(gpu_name=self.gpu.model_name, driver_ver=driver_str)
+        self.top_nav = TopNavBar(gpu_name=self.gpu.model_name, driver_ver=driver_str, is_amd_cpu=self.cpu.is_amd)
         main_layout.addWidget(self.top_nav)
 
         # Views Stack
@@ -88,18 +91,21 @@ class MainWindow(QMainWindow):
         self.home_view = HomeView(self.gpu, top_game, self.audit, self.display, self.profile_mgr)
         self.stack.addWidget(self.home_view)
 
-        # Placeholders for Lazy Loading (Gaming, Performance, Settings)
+        # Placeholders for Lazy Loading (Gaming, Performance, Ryzen Master, Settings)
         self.gaming_view = None
         self.perf_view = None
+        self.ryzen_view = None
         self.settings_view = None
 
         self.dummy_gaming = QWidget()
         self.dummy_perf = QWidget()
+        self.dummy_ryzen = QWidget()
         self.dummy_settings = QWidget()
 
         self.stack.addWidget(self.dummy_gaming)     # idx 1
         self.stack.addWidget(self.dummy_perf)       # idx 2
-        self.stack.addWidget(self.dummy_settings)   # idx 3
+        self.stack.addWidget(self.dummy_ryzen)      # idx 3
+        self.stack.addWidget(self.dummy_settings)   # idx 4
 
         main_layout.addWidget(self.stack)
 
@@ -113,10 +119,15 @@ class MainWindow(QMainWindow):
         self.home_view.navigate_to_tab.connect(self._navigate_to)
         self.home_view.play_game_requested.connect(self._launch_game)
 
-        # Telemetry Monitor (using QTimer)
+        # GPU Telemetry Monitor (using QTimer)
         self.monitor = GpuTelemetryMonitor(self.gpu, interval_ms=1000, parent=self)
         self.monitor.telemetry_updated.connect(self._on_telemetry_updated)
         self.monitor.start()
+
+        # CPU Telemetry Monitor (Ryzen Master)
+        self.cpu_monitor = CpuTelemetryMonitor(self.cpu, interval_ms=1000, parent=self)
+        self.cpu_monitor.telemetry_updated.connect(self._on_cpu_telemetry_updated)
+        self.cpu_monitor.start()
 
         # System Tray Icon
         self._init_tray()
@@ -145,6 +156,12 @@ class MainWindow(QMainWindow):
             self.overlay.activateWindow()
         elif "--tuning" in args or "--performance" in args:
             self._navigate_to(2)
+            self.bring_to_front()
+        elif "--ryzen" in args or "--cpu" in args:
+            self._navigate_to(3)
+            self.bring_to_front()
+        elif "--settings" in args:
+            self._navigate_to(4)
             self.bring_to_front()
         elif "--gaming" in args:
             self._navigate_to(1)
@@ -183,7 +200,9 @@ class MainWindow(QMainWindow):
             self._init_gaming_view()
         elif idx == 2 and self.perf_view is None:
             self._init_perf_view()
-        elif idx == 3 and self.settings_view is None:
+        elif idx == 3 and self.ryzen_view is None:
+            self._init_ryzen_view()
+        elif idx == 4 and self.settings_view is None:
             self._init_settings_view()
 
         self.stack.setCurrentIndex(idx)
@@ -212,15 +231,23 @@ class MainWindow(QMainWindow):
         self.stack.removeWidget(self.dummy_perf)
         self.stack.insertWidget(2, self.perf_view)
 
+    def _init_ryzen_view(self):
+        from .views.ryzen_view import RyzenMasterView
+        self.ryzen_view = RyzenMasterView(self.cpu)
+        
+        # Replace dummy widget at index 3
+        self.stack.removeWidget(self.dummy_ryzen)
+        self.stack.insertWidget(3, self.ryzen_view)
+
     def _init_settings_view(self):
         from .views.settings_view import SettingsView
         self.settings_view = SettingsView(self.gpu, self.audit, self.display)
         self.settings_view.tray_minimize_changed.connect(self._on_tray_minimize_changed)
         self.settings_view.update_center_requested.connect(self._open_update_dialog)
         
-        # Replace dummy widget at index 3
+        # Replace dummy widget at index 4
         self.stack.removeWidget(self.dummy_settings)
-        self.stack.insertWidget(3, self.settings_view)
+        self.stack.insertWidget(4, self.settings_view)
 
     def _on_tray_minimize_changed(self, enabled: bool):
         self.minimize_to_tray = enabled
@@ -238,6 +265,7 @@ class MainWindow(QMainWindow):
 
     def _on_interval_changed(self, interval_ms: int):
         self.monitor.set_interval(interval_ms)
+        self.cpu_monitor.set_interval(interval_ms)
 
     def _launch_game(self, app_id: str):
         game = next((g for g in self.games if g.app_id == app_id), None)
@@ -255,9 +283,15 @@ class MainWindow(QMainWindow):
             load = data.get("gpu_busy", 0)
             self.tray.setToolTip(f"AMD Radeon: {temp:.0f}°C | {load}% Auslastung")
 
+    def _on_cpu_telemetry_updated(self, data: dict):
+        self.home_view.update_cpu_telemetry(data)
+        if self.ryzen_view is not None:
+            self.ryzen_view.update_telemetry(data)
+
     def _quit_app(self):
         self._really_quit = True
         self.monitor.stop()
+        self.cpu_monitor.stop()
         if self._overlay is not None:
             self._overlay.close()
         if hasattr(self, "tray"):
